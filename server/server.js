@@ -156,8 +156,114 @@ class Game {
   }
 }
 
-/* ---------- matchmaking, socket events, start server ---------- */
-/* (IDENTICAL to your current file – omitted for brevity) */
 
+/* ---------- matchmaking ---------- */
+
+
+function tryMatchmaking(){
+  while (matchmakingQueue.length >= 2){
+    const p1 = matchmakingQueue.shift();
+    const p2 = matchmakingQueue.shift();
+    p1.inQueue = p2.inQueue = false;
+
+    p1.coins -= ENTRY_FEE; setCoins(p1.id, p1.coins);
+    p2.coins -= ENTRY_FEE; setCoins(p2.id, p2.coins);
+
+    const game = new Game(p1, p2);
+    activeGames.set(game.id, game);
+    p1.gameId = p2.gameId = game.id;
+
+    io.to(p1.socketId).emit('gameFound', { gameId:game.id, opponent:p2.name });
+    io.to(p2.socketId).emit('gameFound', { gameId:game.id, opponent:p1.name });
+    setTimeout(() => game.startRound(), 2000);
+  }
+}
+
+/* ---------- socket events ---------- */
+io.on('connection', socket => {
+  console.log('🟢', socket.id);
+
+  /* LOGIN -------------------------------------------------- */
+  socket.on('login', ({ name }) => {
+    if (!name || typeof name!=='string' || !name.trim())
+      return socket.emit('loginError', { message:'Name required' });
+
+    const key = normalise(name);
+    if (activeNames.has(key))
+      return socket.emit('loginError', { message:'Name already taken' });
+
+    let row    = getByName(key);
+    let player = row
+      ? new Player(socket.id, name.trim(), row.id, row.coins)
+      : new Player(socket.id, name.trim());
+
+    if (!row) insertPlayer({ id:player.id, name:key, coins:player.coins });
+
+    activeNames.add(key);
+    players.set(socket.id, player);
+
+    socket.emit('playerInfo', { id:player.id, name:player.name, coins:player.coins });
+  });
+
+  /* QUEUE -------------------------------------------------- */
+  socket.on('joinQueue', () => {
+    const p = players.get(socket.id);
+    if (!p || p.inQueue || p.gameId) return;
+    if (p.coins < ENTRY_FEE) return socket.emit('queueError', { message:'Not enough coins' });
+
+    p.inQueue = true;
+    matchmakingQueue.push(p);
+    socket.emit('queueJoined',{ position:matchmakingQueue.length });
+    tryMatchmaking();
+  });
+
+  socket.on('leaveQueue', () => {
+    const p = players.get(socket.id);
+    if (!p || !p.inQueue) return;
+
+    p.inQueue = false;
+    p.coins  += ENTRY_FEE; setCoins(p.id, p.coins);
+    matchmakingQueue.splice(matchmakingQueue.findIndex(x=>x.id===p.id),1);
+    socket.emit('queueLeft');
+  });
+
+  /* GAME -------------------------------------------------- */
+  socket.on('makeChoice', ({ choice }) => {
+    const p = players.get(socket.id);
+    if (!p || !p.gameId) return;
+    const g = activeGames.get(p.gameId);
+    if (g) {
+      g.makeChoice(p.id, choice);
+      socket.emit('choiceConfirmed', { choice });   // client keeps UI in sync
+    }
+  });
+
+  /* DISCONNECT -------------------------------------------- */
+  socket.on('disconnect', () => {
+    console.log('🔴', socket.id);
+    const p = players.get(socket.id);
+    if (!p) return;
+
+    activeNames.delete(normalise(p.name));
+
+    if (p.inQueue){
+      matchmakingQueue.splice(matchmakingQueue.findIndex(x=>x.id===p.id),1);
+      p.coins += ENTRY_FEE; setCoins(p.id,p.coins);
+    }
+    if (p.gameId){
+      const g = activeGames.get(p.gameId);
+      if (g){
+        const opp = g.player1.id===p.id ? g.player2 : g.player1;
+        opp.coins += ENTRY_FEE; setCoins(opp.id, opp.coins);
+        opp.gameId = null;
+        io.to(opp.socketId).emit('opponentDisconnected',{ newBalance:opp.coins });
+        activeGames.delete(g.id);
+      }
+    }
+    players.delete(socket.id);
+  });
+});
+
+/* ---------- start ---------- */
 const PORT = process.env.PORT || 3001;
 server.listen(PORT, () => console.log(`🚀  RPS server @:${PORT}`));
