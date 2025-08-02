@@ -1,0 +1,21 @@
+# ---- Node / Yarn / pnpm ----------
+**/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm/
+.pnpm-debug.log*
+
+# ---- Front-end build artefacts ----
+frontend/dist/
+frontend/.vite/
+frontend/.next/
+frontend/.cache/
+
+# ---- IDE / OS files ---------------
+.DS_Store
+.vscode/
+
+# ---- Environment / secrets --------
+*.env
+.env.*

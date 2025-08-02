@@ -1,0 +1,14 @@
+{
+  "players": [
+    {
+      "id": "dc126ebb-b50e-418e-8216-a238089d18d3",
+      "name": "berti",
+      "coins": 35
+    },
+    {
+      "id": "d0b0ff98-ab36-4a02-baa8-2552c7560795",
+      "name": "berti1",
+      "coins": 20
+    }
+  ]
+}
