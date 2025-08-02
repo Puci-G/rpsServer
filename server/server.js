@@ -131,8 +131,7 @@ class Game {
 
     if (
       this.player1Score >= ROUNDS_TO_WIN ||
-      this.player2Score >= ROUNDS_TO_WIN ||
-      this.currentRound >= MAX_ROUNDS
+      this.player2Score >= ROUNDS_TO_WIN
     ) {
       return setTimeout(() => this.endGame(), 3000);
     }
