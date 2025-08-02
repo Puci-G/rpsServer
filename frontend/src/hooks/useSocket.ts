@@ -4,7 +4,7 @@ import { Player, GameState, QueueState, Choice } from '../types';
 type LoginError = { message: string };
 
 
-const SERVER_URL = 'http://localhost:3001';
+const SERVER_URL = 'https://rpsserver-production.up.railway.app';
 
 export const useSocket = () => {
   const [socket, setSocket] = useState<Socket | null>(null);
@@ -32,7 +32,8 @@ export const useSocket = () => {
   useEffect(() => {
     const newSocket = io(SERVER_URL, {
       transports: ['websocket'],
-      upgrade: false
+      upgrade: false,
+      secure: true  
     });
     
     setSocket(newSocket);

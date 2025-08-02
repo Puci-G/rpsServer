@@ -9,6 +9,26 @@
       "id": "d0b0ff98-ab36-4a02-baa8-2552c7560795",
       "name": "berti1",
       "coins": 20
+    },
+    {
+      "id": "6e0812e7-fce6-42f7-b56c-bf526d950c4b",
+      "name": "eri",
+      "coins": 20
+    },
+    {
+      "id": "aaf652bd-4c0f-4c9c-9011-a59b5d7a04dd",
+      "name": "igli",
+      "coins": 35
+    },
+    {
+      "id": "07e61057-4bd2-404f-83bb-23e5d0e1f468",
+      "name": "frv",
+      "coins": 25
+    },
+    {
+      "id": "fc88bba7-962c-4f8e-9b84-db8a1fb314d4",
+      "name": "frb",
+      "coins": 15
     }
   ]
 }
