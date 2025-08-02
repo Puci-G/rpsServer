@@ -4,15 +4,13 @@
    ------------------------------------------------------------ */
 import express from 'express';
 import cors    from 'cors';
-import dotenv from 'dotenv';      
 import { createServer } from 'http';
 import { Server }       from 'socket.io';
 import { v4 as uuidv4 } from 'uuid';
 import { getByName, insertPlayer, setCoins } from './db.js';   // ← see db.js
 
-dotenv.config();
 /* ---------- constants ---------- */
-const ORIGIN         = process.env.CORS_ORIGIN || 'http://localhost:5173';
+const ORIGIN         = 'http://localhost:5173';
 const STARTING_COINS = 20;
 const ENTRY_FEE      = 5;
 const ROUND_TIME     = 7000;   // ms
