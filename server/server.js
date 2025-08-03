@@ -27,6 +27,8 @@ const io = new Server(server, {
   perMessageDeflate: false        // ⬅ turn compression off
 });
 
+console.log('♦ perMessageDeflate is', io.opts.perMessageDeflate);
+
 app.use(cors({ origin: ORIGIN }));
 app.use(express.json());
 
