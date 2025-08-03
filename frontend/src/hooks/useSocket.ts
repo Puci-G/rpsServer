@@ -30,7 +30,7 @@ export const useSocket = () => {
 
   useEffect(() => {
     const newSocket = io(SERVER_URL, {
-      transports: ["websocket"],
+      transports: ["polling"],
       upgrade: false,
       secure: true,
     });
