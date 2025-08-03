@@ -8,8 +8,11 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import { v4 as uuidv4 } from "uuid";
 import { getByName, insertPlayer, setCoins } from "./db.js";
+import dotenv from 'dotenv';
 
-const ORIGIN = "http://localhost:5173";
+dotenv.config();
+
+const ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:5173';
 const STARTING_COINS = 20;
 const ENTRY_FEE = 5;
 const ROUND_TIME = 7000; // ms
