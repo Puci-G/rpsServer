@@ -24,6 +24,7 @@ const app = express();
 const server = createServer(app);
 const io = new Server(server, {
   cors: { origin: ORIGIN, methods: ["GET", "POST"] },
+  perMessageDeflate: false        // ⬅ turn compression off
 });
 
 app.use(cors({ origin: ORIGIN }));
