@@ -1,21 +1,23 @@
-import { Header } from './components/Header';
-import { GameLobby } from './components/GameLobby';
-import { GameArena } from './components/GameArena';
-import { useSocket } from './hooks/useSocket';
-import { LoginModal } from './components/LoginModal';
+import { Header } from "./components/Header";
+import { GameLobby } from "./components/GameLobby";
+import { GameArena } from "./components/GameArena";
+import { useSocket } from "./hooks/useSocket";
+import { LoginModal } from "./components/LoginModal";
+import { ConnectionBanner } from "./components/ConnectionBanner";
 
 function App() {
   const {
     connected,
     player,
     login,
+    logout,
     loginErr,
     gameState,
     queueState,
     joinQueue,
     leaveQueue,
     makeChoice,
-    restartAsGuest
+    restartAsGuest,
   } = useSocket();
 
   const handlePlayAgain = () => {
@@ -24,20 +26,21 @@ function App() {
     }
   };
 
-  const isInGame = gameState.gameId && [
-    'starting', 
-    'round', 
-    'results', 
-    'finished'
-  ].includes(gameState.gamePhase);
+  const isInGame =
+    !!gameState.gameId &&
+    ["starting", "round", "results", "finished"].includes(gameState.gamePhase);
 
   return (
     <div className="min-h-screen p-4">
-     {!player && <LoginModal login={login} loginErr={loginErr} />} 
+      {!player && <LoginModal login={login} loginErr={loginErr} />}
 
       <div className="max-w-7xl mx-auto">
-        <Header player={player} connected={connected} />
-        
+        <Header player={player} connected={connected} onLogout={logout} />
+        <ConnectionBanner
+          isOffline={!connected}
+          opponentAway={gameState.opponentAway}
+          graceExpiresAt={gameState.graceExpiresAt}
+        />
         <main className="space-y-6">
           {!isInGame && (
             <GameLobby
@@ -48,7 +51,7 @@ function App() {
               onRestartAsGuest={restartAsGuest}
             />
           )}
-          
+
           {isInGame && (
             <GameArena
               gameState={gameState}
@@ -57,11 +60,11 @@ function App() {
             />
           )}
         </main>
-        
-        {/* Footer */}
+
         <footer className="mt-12 text-center">
           <p className="text-purple-300 text-sm">
-            Real-time multiplayer Rock Paper Scissors • Built with React & Socket.io
+            Real-time multiplayer Rock Paper Scissors • Built with React &
+            Socket.io
           </p>
         </footer>
       </div>

@@ -1,0 +1,16 @@
+{
+  "watch": ["apps/server/src"],       
+  "ignore": [
+    "apps/server/players.json",      
+    "**/node_modules/**",
+    ".git",
+    "*.log",
+    "*.lock",
+    "*.tmp",
+    "apps/client/**"
+  ],
+  "ext": "js,json",
+  "delay": "150ms",
+  "exec": "node apps/server/server.js",
+  "legacyWatch": true
+}

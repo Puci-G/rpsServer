@@ -1,0 +1,64 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Player {
+  id        String   @id @default(uuid())
+  username  String   @unique
+  depPath   Int      @unique
+  balance   BigInt   @default(0)
+  createdAt DateTime @default(now())
+  gamesAsP1 Game[]   @relation("P1")
+  gamesAsP2 Game[]   @relation("P2")
+  ledger    Ledger[]
+  Game      Game[]
+}
+
+model Game {
+  id        String     @id @default(uuid())
+  createdAt DateTime   @default(now())
+  status    GameStatus @default(PENDING)
+  player1Id String
+  player2Id String?
+  winnerId  String?
+  rounds    Int        @default(3)
+  wager     BigInt     @default(0)
+  meta      Json?
+
+  player1 Player  @relation("P1", fields: [player1Id], references: [id])
+  player2 Player? @relation("P2", fields: [player2Id], references: [id])
+  winner  Player? @relation(fields: [winnerId], references: [id])
+}
+
+model Ledger {
+  id        String     @id @default(uuid())
+  playerId  String
+  kind      LedgerKind
+  amount    BigInt
+  ref       String?
+  createdAt DateTime   @default(now())
+
+  player Player @relation(fields: [playerId], references: [id])
+
+  @@index([playerId, createdAt])
+}
+
+enum GameStatus {
+  PENDING
+  ACTIVE
+  COMPLETE
+  CANCELLED
+}
+
+enum LedgerKind {
+  DEPOSIT
+  WITHDRAWAL
+  GAME_WIN
+  GAME_LOSS
+  ADJUSTMENT
+}

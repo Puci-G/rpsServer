@@ -14,6 +14,10 @@ export interface GameState {
   selectedChoice: string | null;
   gamePhase: 'waiting' | 'starting' | 'round' | 'results' | 'finished';
   lastRoundResult: RoundResult | null;
+
+  // new (optional) flags for DC grace UI
+  opponentAway?: boolean;
+  graceExpiresAt?: number | null; // ms epoch
 }
 
 export interface RoundResult {
@@ -36,9 +40,13 @@ export interface SocketEvents {
   leaveQueue: () => void;
   makeChoice: (data: { choice: Choice }) => void;
   restartAsGuest: () => void;
-  
+  login: (data: { name: string }) => void;
+  resume: (data: { id: string }) => void;
+  logout: () => void;
+
   // Server to Client
   playerInfo: (data: Player) => void;
+  loginError: (data: { message: string }) => void;
   queueJoined: (data: { position: number; queueSize: number }) => void;
   queueLeft: () => void;
   gameFound: (data: { gameId: string; opponent: string; newBalance: number }) => void;
@@ -47,6 +55,12 @@ export interface SocketEvents {
   choiceConfirmed: (data: { choice: Choice }) => void;
   roundResult: (data: { yourChoice: Choice; opponentChoice: Choice; result: 'win' | 'lose' | 'tie'; player1Score: number; player2Score: number; round: number }) => void;
   gameEnd: (data: { winner: 'you' | 'opponent' | 'tie'; finalScore: { player1: number; player2: number }; coinsWon: number; newBalance: number }) => void;
+
+  opponentAway: (data: { gameId: string; expiresAt: number; seconds: number }) => void;
+  opponentBack: (data: { gameId: string }) => void;
+  opponentForfeited: (data: { gameId: string; coinsWon: number; newBalance: number }) => void;
   opponentDisconnected: (data: { newBalance: number }) => void;
+
   error: (data: { message: string }) => void;
+  loggedOut: () => void;
 }
